@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Private user accounts
+    match /users/{userId} {
+      // Allow list and get so unauthenticated users can check username availability & authenticate
+      allow get, list: if true;
+      allow create: if true;
+      allow update: if request.resource.data.username == resource.data.username; // Username is immutable
+      allow delete: if isOwner(userId);
+    }
+
+    // Public profile search index
+    match /public_profiles/{profileId} {
+      allow read: if true;
+      allow create, update, delete: if true;
+    }
+
+    // Transient store-and-forward encrypted messages
+    match /pending_messages/{messageId} {
+      allow create, read, list, get, delete: if true;
+    }
+
+    // Presence & typing signals
+    match /signals/{signalId} {
+      allow create, read, list, get, delete: if true;
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "CipherX - E2EE Ephemeral Messenger",
+  "description": "Ultra-secure, zero-knowledge, end-to-end encrypted messaging platform with ephemeral messages, security keys, and QR connection.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

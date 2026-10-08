@@ -1,0 +1,103 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Private user account profile and cryptographic credentials",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "username": { "type": "string", "minLength": 3, "maxLength": 30 },
+        "fullName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "avatar": { "type": "string", "maxLength": 500000 },
+        "bio": { "type": "string", "maxLength": 300 },
+        "accountType": { "type": "string", "enum": ["public", "private"] },
+        "passwordHash": { "type": "string", "maxLength": 256 },
+        "passwordSalt": { "type": "string", "maxLength": 128 },
+        "securityKeyHash": { "type": "string", "maxLength": 256 },
+        "securityKeySalt": { "type": "string", "maxLength": 128 },
+        "securityKeyEncrypted": { "type": "string", "maxLength": 1000 },
+        "publicKey": { "type": "string", "maxLength": 2000 },
+        "settings": {
+          "type": "object",
+          "properties": {
+            "readReceipts": { "type": "boolean" },
+            "typingIndicators": { "type": "boolean" },
+            "onlineStatus": { "type": "boolean" },
+            "defaultEphemeralSeconds": { "type": "number" }
+          }
+        },
+        "blockedUserIds": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "username", "fullName", "accountType", "passwordHash", "securityKeyHash", "publicKey"]
+    },
+    "PublicProfile": {
+      "title": "PublicProfile",
+      "description": "Public directory entry for user search",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "username": { "type": "string", "minLength": 3, "maxLength": 30 },
+        "fullName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "avatar": { "type": "string", "maxLength": 500000 },
+        "bio": { "type": "string", "maxLength": 300 },
+        "publicKey": { "type": "string", "maxLength": 2000 },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "username", "fullName", "publicKey"]
+    },
+    "PendingMessage": {
+      "title": "PendingMessage",
+      "description": "Transient end-to-end encrypted message waiting for client retrieval",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "senderId": { "type": "string" },
+        "senderUsername": { "type": "string" },
+        "recipientId": { "type": "string" },
+        "ciphertext": { "type": "string", "maxLength": 2000000 },
+        "iv": { "type": "string", "maxLength": 128 },
+        "salt": { "type": "string", "maxLength": 128 },
+        "senderPublicKey": { "type": "string", "maxLength": 2000 },
+        "ephemeralSeconds": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "senderId", "recipientId", "ciphertext", "iv", "salt"]
+    },
+    "SignalEvent": {
+      "title": "SignalEvent",
+      "description": "Real-time presence and typing signals without content leakage",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "senderId": { "type": "string" },
+        "recipientId": { "type": "string" },
+        "type": { "type": "string", "enum": ["typing", "read", "online"] },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["id", "senderId", "recipientId", "type", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Private user account record"
+    },
+    "/public_profiles/{profileId}": {
+      "schema": "PublicProfile",
+      "description": "Public user directory for public search"
+    },
+    "/pending_messages/{messageId}": {
+      "schema": "PendingMessage",
+      "description": "Temporary encrypted store-and-forward message payload"
+    },
+    "/signals/{signalId}": {
+      "schema": "SignalEvent",
+      "description": "Transient presence and typing status signaling"
+    }
+  }
+}
